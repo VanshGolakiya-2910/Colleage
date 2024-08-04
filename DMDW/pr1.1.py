@@ -1,7 +1,7 @@
 import pandas as pd 
 import numpy as np  
 import shutil
-df=pd.read_csv(r"imports-85-pr2.csv")
+df=pd.read_csv(r"DMDW\pr1_imports-85.csv")
 df.iloc[:, 1:] = df.iloc[:, 1:].replace('?', np.nan)
 # df['normalized-losses']=df['normalized-losses'].astype(float)
 # mean2=df['normalized-losses'].mean()
