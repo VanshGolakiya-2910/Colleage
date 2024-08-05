@@ -1,15 +1,21 @@
 import numpy as np
 
 def inp_key():
-    inp_length = int(input("Enter the size of the matrix (n for an n x n matrix): "))
-    key = input("Enter a key: ").replace(" ", "")
-    
-    if len(key) > inp_length**2:
-        key = key[:inp_length**2]
-    elif len(key) < inp_length**2:
-        key = key.ljust(inp_length**2, 'X')  # Pad with 'X' if key is too short
-    mat_key = create_key_matrix(key, inp_length)
-    return mat_key
+    while True:
+        inp_length = int(input("Enter the size of the matrix (n for an n x n matrix): "))
+        key = input("Enter a key: ").replace(" ", "")
+        
+        if len(key) > inp_length**2:
+            key = key[:inp_length**2]
+        elif len(key) < inp_length**2:
+            key = key.ljust(inp_length**2, 'x')  # Pad with 'x' if key is too short
+        
+        mat_key = create_key_matrix(key, inp_length)
+        
+        if is_invertible(mat_key, 26):
+            return mat_key
+        else:
+            print("The key matrix is not invertible. Please enter a different key.")
 
 def create_key_matrix(key, size):
     key = key.lower()
@@ -37,18 +43,19 @@ def mat_mul(mat1, mat2):
 def get_ans(matrix):
     return ''.join([chr(97 + int(num)) for num in matrix])
 
-def inverse(matrix):
+def mod_inverse(matrix, modulus):
+    det = int(np.round(np.linalg.det(matrix)))
+    det_inv = pow(det, -1, modulus)
+    adjugate = np.round(det * np.linalg.inv(matrix)).astype(int) % modulus
+    return (det_inv * adjugate) % modulus
+
+def is_invertible(matrix, modulus):
+    det = int(np.round(np.linalg.det(matrix)))
     try:
-        inv_matrix = np.linalg.inv(matrix) % 26
-        # Convert to integer matrix
-        inv_matrix = np.round(inv_matrix).astype(int)
-        # Modulo inverse correction
-        inv_matrix = inv_matrix % 26
-        return inv_matrix
-    except np.linalg.LinAlgError:
-        return "Matrix inversion error"
-    except Exception as e:
-        return str(e)
+        pow(det, -1, modulus)
+        return True
+    except ValueError:
+        return False
 
 def encrypt(plaintext, key_matrix):
     size = key_matrix.shape[0]
@@ -59,8 +66,7 @@ def encrypt(plaintext, key_matrix):
 
 def decrypt(ciphertext, key_matrix):
     size = key_matrix.shape[0]
-    # Compute the inverse of the key matrix
-    inv_key_matrix = inverse(key_matrix)
+    inv_key_matrix = mod_inverse(key_matrix, 26)
     
     if isinstance(inv_key_matrix, str):
         return inv_key_matrix  # Return the error message if inversion failed
@@ -68,23 +74,61 @@ def decrypt(ciphertext, key_matrix):
     text_matrix = create_text_matrix(ciphertext, size)
     decrypted_matrix = mat_mul(text_matrix, inv_key_matrix)
     decrypted_text = get_ans(decrypted_matrix.flatten())
-    return decrypted_text.strip('X')  # Remove padding characters if any
+    return decrypted_text.strip('x')  # Remove padding characters if any
 
-# Final execution block
-if __name__ == "__main__":
-    # Input key and create key matrix
+def main_menu():
+    print("1. Encrypt a file")
+    print("2. Decrypt a file")
+    print("3. Exit")
+    choice = input("Enter your choice (1/2/3): ")
+    return choice
+
+def main():
     key_matrix = inp_key()
     print("Key Matrix:")
     print(key_matrix)
+   
+    while True:
+        choice = main_menu()
+       
+        if choice == '1':
+            input_file = "INS\input.txt"
+            output_file = "INS\encrypted.txt"
+            try:
+                with open(input_file, 'r') as file:
+                    plaintext = file.read().strip().replace(" ", "")
+                encrypted_text = encrypt(plaintext, key_matrix)
+                with open(output_file, 'w') as file:
+                    file.write(encrypted_text)
+                print(f"File encrypted and saved to {output_file}")
+                print("Encrypted text:", encrypted_text)
+            except FileNotFoundError:
+                print(f"The file '{input_file}' does not exist. Please check the file path and try again.")
+            except Exception as e:
+                print(f"An error occurred during encryption: {e}")
 
-    # Encrypting a message
-    plaintext = input("Enter plaintext to encrypt: ").replace(" ", "")
-    encrypted_text = encrypt(plaintext, key_matrix)
-    print("Encrypted Text:")
-    print(encrypted_text)
+        elif choice == '2':
+            input_file = "INS\encrypted.txt"
+            output_file = "INS\decrypted.txt"
+            try:
+                with open(input_file, 'r') as file:
+                    ciphertext = file.read().strip().replace(" ", "")
+                decrypted_text = decrypt(ciphertext, key_matrix)
+                with open(output_file, 'w') as file:
+                    file.write(decrypted_text)
+                print(f"File decrypted and saved to {output_file}")
+                print("Decrypted text:", decrypted_text)
+            except FileNotFoundError:
+                print(f"The file '{input_file}' does not exist. Please check the file path and try again.")
+            except Exception as e:
+                print(f"An error occurred during decryption: {e}")
 
-    # Decrypting the message
-    ciphertext = input("Enter ciphertext to decrypt: ").replace(" ", "")
-    decrypted_text = decrypt(ciphertext, key_matrix)
-    print("Decrypted Text:")
-    print(decrypted_text)
+        elif choice == '3':
+            print("Exiting program...")
+            break
+       
+        else:
+            print("Invalid choice. Please enter 1, 2, or 3.")
+
+if __name__ == "__main__":
+    main()
