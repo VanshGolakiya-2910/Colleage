@@ -1,72 +1,91 @@
 from collections import deque
+
 def states():
-    intial = (input("Enter the initail state rowwiswe(list):"))
-    final = (input("Enter the initail state rowwiswe(list):"))
-    for i in range(len(intial)):
-        for j in range(len(intial[i])):
-            if intial[i][j] not in [1,2,3,4,5,6,7,8]:
-                intial[i][j]='#'
-            if final[i][j] not in [1,2,3,4,5,7,8]:
-                final[i][j]='#'
-    return intial,final
+    initial_str = input("Enter the initial state row-wise (space-separated): ")
+    final_str = input("Enter the final state row-wise (space-separated): ")
+
+    initial = [list(map(int, initial_str.split()[i:i + 3])) for i in range(0, 9, 3)]
+    final = [list(map(int, final_str.split()[i:i + 3])) for i in range(0, 9, 3)]
+
+    return initial, final
+
 def possible_move(current):
-    move=[]
-    hash_index,i=find_hash_index(current)
-    if current[i]!=0:
-        move.append(up(current))
-    elif current[i]!=2:
-        move.append(down(current))
-    elif hash_index!=2:
-        move.append(left(current))
-    elif hash_index!=0:
-        move.append(right(current))
+    moves = []
+    hash_index, i = find_hash_index(current)
+    if i > 0:  # Can move up
+        moves.append(up(current))
+    if i < len(current) - 1:  # Can move down
+        moves.append(down(current))
+    if hash_index > 0:  # Can move left
+        moves.append(left(current))
+    if hash_index < len(current[i]) - 1:  # Can move right
+        moves.append(right(current))
+    return moves
+
 def find_hash_index(current):
-        for i in range(len(current)):
-            hash_index=current[i].index('#')
-        return hash_index,i
+    for i in range(len(current)):
+        if 0 in current[i]:  # Assuming 0 represents the empty space
+            hash_index = current[i].index(0)
+            return hash_index, i
+
 def up(current):
-    hash_index,i=find_hash_index(current)
-    current[i-1][hash_index],current[i][hash_index]= current[i][hash_index],current[i-1][hash_index]
-    return current,True
+    new_state = [row[:] for row in current]
+    hash_index, i = find_hash_index(new_state)
+    new_state[i][hash_index], new_state[i-1][hash_index] = new_state[i-1][hash_index], new_state[i][hash_index]
+    return new_state
+
 def down(current):
-    hash_index,i=find_hash_index(current)
-    current[i+1][hash_index],current[i][hash_index]= current[i][hash_index],current[i+1][hash_index]
-    return current,True
+    new_state = [row[:] for row in current]
+    hash_index, i = find_hash_index(new_state)
+    new_state[i][hash_index], new_state[i+1][hash_index] = new_state[i+1][hash_index], new_state[i][hash_index]
+    return new_state
+
 def left(current):
-    hash_index,i=find_hash_index(current)
-    current[i][hash_index+1],current[i][hash_index]= current[i][hash_index],current[i][hash_index+1]
-    return current,True
+    new_state = [row[:] for row in current]
+    hash_index, i = find_hash_index(new_state)
+    new_state[i][hash_index], new_state[i][hash_index-1] = new_state[i][hash_index-1], new_state[i][hash_index]
+    return new_state
+
 def right(current):
-    hash_index,i=find_hash_index(current)
-    current[i][hash_index-1],current[i][hash_index]= current[i][hash_index],current[i][hash_index-1]
-    return current,True
+    new_state = [row[:] for row in current]
+    hash_index, i = find_hash_index(new_state)
+    new_state[i][hash_index], new_state[i][hash_index+1] = new_state[i][hash_index+1], new_state[i][hash_index]
+    return new_state
+
 def are_2d_lists_equal(list1, list2):
-    if len(list1) != len(list2):
-        return False
-    for sublist1, sublist2 in zip(list1, list2):
-        if len(sublist1) != len(sublist2):
-            return False
-        for item1, item2 in zip(sublist1, sublist2):
-            if item1 != item2:
-                return False
-    return True
+    return list1 == list2
 
 def BFS():
-    initial,final=states()
-    visited = set()        
-    queue = deque(initial)  
-    result = []            
+    initial, final = states()
+    initial = tuple(map(tuple, initial))
+    final = tuple(map(tuple, final))
+
+    visited = set()
+    queue = deque([(initial, [])])
+
     while queue:
-        node = queue.popleft()  
-        if node not in visited:
-            moves=possible_move(node)
-            
-            visited.add(node)    # Mark the node as visited
-            result.append(node)  # Add the node to the result list
-            # Add all unvisited adjacent nodes to the queue
-            for neighbor in graph[node]:
-                if neighbor not in visited:
-                    queue.append(neighbor)
-    
-    return result
-states()
+        current, path = queue.popleft()
+
+        if current in visited:
+            continue
+        
+        visited.add(current)
+
+        if current == final:
+            return path + [current]
+
+        for move in possible_move(list(map(list, current))):
+            move_tuple = tuple(map(tuple, move))
+            if move_tuple not in visited:
+                queue.append((move_tuple, path + [current]))
+
+    return None
+
+solution = BFS()
+if solution:
+    for step in solution:
+        for row in step:
+            print(row)
+        print()
+else:
+    print("No solution found.")
