@@ -102,13 +102,13 @@ def main():
         choice = main_menu()
         
         if choice == '1':
-            input_file = input("Enter the path of the input file (default: D:\\ET22BTCO039\\monoalpha\\input.txt): ") or "D:\\ET22BTCO039\\monoalpha\\input.txt"
-            output_file = input("Enter the path where encrypted file should be stored (default: D:\\ET22BTCO039\\monoalpha\\encrypted.txt): ") or "D:\\ET22BTCO039\\monoalpha\\encrypted.txt"
+            input_file = input("Enter the path of the input file (default: input.txt): ") or "input.txt"
+            output_file = input("Enter the path where encrypted file should be stored (default: encrypted.txt): ") or "encrypted.txt"
             encryption(input_file, output_file, key)
         
         elif choice == '2':
-            input_file = input("Enter the path of the encrypted file (default: D:\\ET22BTCO039\\monoalpha\\encrypted.txt): ") or "D:\\ET22BTCO039\\monoalpha\\encrypted.txt"
-            output_file = input("Enter the path where decrypted file should be stored (default: D:\\ET22BTCO039\\monoalpha\\decrypted.txt): ") or "D:\\ET22BTCO039\\monoalpha\\decrypted.txt"
+            input_file = input("Enter the path of the encrypted file (default: encrypted.txt): ") or "encrypted.txt"
+            output_file = input("Enter the path where decrypted file should be stored (default: decrypted.txt): ") or "decrypted.txt"
             decryption(input_file, output_file, key)
         
         elif choice == '3':
