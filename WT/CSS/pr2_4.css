@@ -1,0 +1,23 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+.box{
+    background-image: url(photo-1576158114131-f211996e9137.avif);
+    background-size: 100% 100%;
+    background-color: #E64833;
+    margin: 50px;
+    padding: 50px;
+    border:2px solid #244855;
+    color:#fbe9d0;
+    width: 500px;
+    height: 500px;
+    background-attachment: fixed;
+    filter: grayscale(100%);
+}
+.box:hover{
+    filter: grayscale(0%);
+    transform: scale(0.5);
+    transition-duration: 2s;
+}

@@ -1,0 +1,28 @@
+*{
+    margin: 0px;
+    padding: 0px;
+    box-sizing: border-box;
+}
+.box{
+    background-color: #E64833;
+    margin: 50px;
+    padding: 50px;
+    border:2px solid #244855;
+    border-radius: 50%;
+    color:#fbe9d0;
+    width: 100px;
+    height: 100px;
+    animation: move-and-scale 3s infinite;  
+}
+@keyframes move-and-scale {
+    0% {
+      transform: translateX(0) scale(1);
+    }
+    50% {
+      transform: translateX(100px) scale(1.5);
+    }
+    100% {
+      transform: translateX(0) scale(1);
+    }
+  }
+  
